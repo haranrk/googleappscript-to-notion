@@ -67,13 +67,7 @@ function logSyncedEvents(calendarId, fullSync) {
             var end = new Date(event.end.dateTime);
             console.log("%s (%s)", event.summary, start.toLocaleString());
           }
-          createNewPageInJournal(
-            event.summary,
-            start,
-            end,
-            event.attendees,
-            false
-          );
+          createNewPageInJournal(event.summary, start, end, event.attendees);
         }
       }
     } else {
@@ -105,13 +99,7 @@ function getNotionHeaders() {
   };
 }
 
-function createNewPageInJournal(
-  title,
-  startDate,
-  endDate,
-  attendees,
-  debug = false
-) {
+function createNewPageInJournal(title, startDate, endDate, attendees) {
   const create_page_url = "https://api.notion.com/v1/pages";
   const data = {
     parent: {
@@ -137,12 +125,6 @@ function createNewPageInJournal(
           end: getFormattedDateString(endDate),
           time_zone: "Asia/Kolkata",
         },
-      },
-      Tags: {
-        multi_select: [{ name: "Journal Entry" }],
-      },
-      Debug: {
-        checkbox: debug,
       },
     },
   };
