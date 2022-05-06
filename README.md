@@ -47,5 +47,6 @@ The database should have a column of type `date`, named `Date`
 
 
 Everything should work! You can try it out by running the main function to see if it works.
+![image](https://user-images.githubusercontent.com/19757243/167090961-538fd804-80b8-47e8-9147-d7f7a3a68701.png)
 
 
