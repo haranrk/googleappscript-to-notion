@@ -1,6 +1,6 @@
 # Google calendar to Notion
 
-A simple utility for automatically creating a notion page for a new calendar event
+A simple utility for automatically creating a notion page for a new calendar event. It will create a new page and fills the page with attendee details.
 
 # How to install
 
