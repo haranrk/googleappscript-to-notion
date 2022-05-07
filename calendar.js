@@ -67,7 +67,12 @@ function logSyncedEvents(calendarId, fullSync) {
             var end = new Date(event.end.dateTime);
             console.log("%s (%s)", event.summary, start.toLocaleString());
           }
-          createNewPageInJournal(event.summary, start, end, event.attendees);
+          console.log(event.attendees);
+          if (doesEventExistInJournal(event.summary, start, end)) {
+            console.log("Event Already exists in database");
+          } else {
+            createNewPageInJournal(event.summary, start, end, event.attendees);
+          }
         }
       }
     } else {
@@ -164,6 +169,11 @@ function createNewPageInJournal(title, startDate, endDate, attendees) {
           color: "default",
         },
       },
+      {
+        object: "block",
+        type: "divider",
+        divider: {},
+      },
     ];
   }
 
@@ -174,15 +184,17 @@ function createNewPageInJournal(title, startDate, endDate, attendees) {
   });
   // const responseData = JSON.parse(response.getContentText())
   // console.log(responseData)
-  console.log(response.getResponseCode());
+  console.log(`${title} page created`);
 }
 
 function convertAttendeesToString(attendees) {
-  return attendees.reduce((acc, attendee) => {
-    return `${acc}\n${attendee.email} ${
-      attendee.displayName ? " - " + attendee.displayName : ""
-    }`;
-  }, "");
+  return attendees
+    .reduce((acc, attendee) => {
+      return `${attendee.email} ${
+        attendee.displayName ? " - " + attendee.displayName : ""
+      }\n${acc}`;
+    }, "")
+    .trim();
 }
 
 function getPagesFromJournal() {
@@ -197,8 +209,33 @@ function getPagesFromJournal() {
   const responseData = JSON.parse(response.getContentText());
   console.log(responseData);
   for (page of responseData.results) {
-    console.log(page.properties);
+    console.log(page.properties.Name.title);
   }
+}
+
+function doesEventExistInJournal(eventName, start, end) {
+  const search_url = "https://api.notion.com/v1/search";
+  const data = {
+    query: eventName,
+  };
+  const response = UrlFetchApp.fetch(search_url, {
+    headers: getNotionHeaders(),
+    payload: JSON.stringify(data),
+  });
+  const responseData = JSON.parse(response.getContentText());
+  // console.log(responseData);
+  for (page of responseData.results) {
+    if (
+      page.properties.Name.title[0].plain_text == eventName &&
+      getFormattedDateString(new Date(page.properties.Date.date.start)) ==
+        getFormattedDateString(start) &&
+      getFormattedDateString(new Date(page.properties.Date.date.end)) ==
+        getFormattedDateString(end)
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function getFormattedDateString(date) {
